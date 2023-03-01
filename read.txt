@@ -1,0 +1,2 @@
+https://www.kaggle.com/code/rohitsingh9990/panda-eda-better-visualization-simple-baseline
+https://www.kaggle.com/code/tanulsingh077/prostate-cancer-in-depth-understanding-eda-model
