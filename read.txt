@@ -1,2 +1,50 @@
+data analysis: 
+
 https://www.kaggle.com/code/rohitsingh9990/panda-eda-better-visualization-simple-baseline
 https://www.kaggle.com/code/tanulsingh077/prostate-cancer-in-depth-understanding-eda-model
+https://www.kaggle.com/code/wouterbulten/getting-started-with-the-panda-dataset
+https://www.kaggle.com/code/dhananjay3/panda-eda-all-you-need-to-know
+https://www.kaggle.com/code/mpwolke/prostate-carcinoma-guidelines
+
+
+suspicious data:
+https://www.kaggle.com/code/iamleonie/panda-eda-visualizations-suspicious-data
+
+
+
+https://www.kaggle.com/code/iafoss/panda-16x128x128-tiles/notebook	make tiles
+https://www.kaggle.com/code/haqishen/train-efficientnet-b0-w-36-tiles-256-lb0-87	make tiles torch
+
+
+
+tiles good:
+https://www.kaggle.com/code/rftexas/better-image-tiles-removing-white-spaces
+https://www.kaggle.com/code/akensert/panda-optimized-tiling-tf-data-dataset
+https://www.kaggle.com/code/dlarionov/tile-factory
+
+
+preprocess:
+https://www.kaggle.com/code/debanga/let-s-enhance-the-images/comments
+
+
+tensorflow visualizing the tensor activation (GradCam):
+
+https://www.kaggle.com/code/rftexas/implementing-gradcam-with-keras-for-error-analysis?scriptVersionId=35320717
+
+tensorflow:
+https://www.kaggle.com/code/vgarshin/panda-keras-baseline
+https://www.kaggle.com/code/amyjang/tensorflow-cnn-data-augmentation-prostate-cancer
+https://www.kaggle.com/code/frlemarchand/high-res-samples-into-multi-input-cnn-keras
+https://www.kaggle.com/code/yeayates21/panda-densenet-keras-starter-gpu/notebook
+
+https://www.kaggle.com/code/vgarshin/panda-keras-timedistributed
+
+https://www.kaggle.com/code/micheomaano/pandas-42x256x256x3-inference
+
+quadratic weighted kappa:
+https://www.kaggle.com/code/prashant111/simple-explanation-of-quadratic-weighted-kappa
+
+drawing rectangles:
+https://www.kaggle.com/code/akensert/panda-drawing-rectangles
+
+
