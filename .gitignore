@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+sandbox/train_images/
+sandbox/train_label_masks/
+
 # Distribution / packaging
 .Python
 build/
