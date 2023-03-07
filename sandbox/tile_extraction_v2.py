@@ -15,9 +15,9 @@ def read_image(image_path, resize_ratio=1):
         # if tensor with byte string
         image_path = image_path.numpy().decode('utf-8')
         
-    image_level_1 = skimage.io.MultiImage(image_path)
+    image_level_1 = skimage.io.ImageCollection(image_path)
     print(len(image_level_1))
-    image_level_1 = image_level_1[-1]
+    image_level_1 = image_level_1[1]
     if resize_ratio != 1:
         new_w = int(image_level_1.shape[1]*resize_ratio)
         new_h = int(image_level_1.shape[0]*resize_ratio)
