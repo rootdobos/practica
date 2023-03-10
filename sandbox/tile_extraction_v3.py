@@ -13,12 +13,12 @@ import utils3
 
 IMG_DIR = 'train_images/'
 
-LAYER = 1 # medium
-SIZE = 312
-COLS = 4
-ROWS = 4
+LAYER = 1
+SIZE = 128
+COLS = 5
+ROWS = 5
 N = COLS*ROWS
-TILES_DIR="tiles"
+TILES_DIR="tiles/{}_{}_{}".format(SIZE,COLS,ROWS)
 def process_image(idx):    
 
     im = utils3.imread(os.path.join(IMG_DIR, f"{idx}.tiff"), layer=LAYER)
@@ -89,7 +89,6 @@ def lafoss_tiles(img:np.ndarray)->np.ndarray:
     return merged
 
 def akensert_tiles(img:np.ndarray, debug=False)->np.ndarray:    
-    
     # get tile coords
     img, coords = utils3.compute_coords(
         img,
@@ -99,7 +98,6 @@ def akensert_tiles(img:np.ndarray, debug=False)->np.ndarray:
         min_axis_info=0.35,
         min_consec_axis_info=0.35,
         min_decimal_keep=0.7)
-    
     # sort coords (high info -> low info)
     coords = sorted(coords, key= lambda x: x[0], reverse=False)
     

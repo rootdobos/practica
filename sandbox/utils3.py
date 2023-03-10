@@ -19,7 +19,7 @@ def unsharp_masking(img):
     img_gaussian = cv2.GaussianBlur(img, (21,21), 10.0)
     return cv2.addWeighted(img, 1.8, img_gaussian, -0.8, 0, img)
 
-def _mask_tissue(image, kernel_size=(7, 7), gray_threshold=220):
+def _mask_tissue(image, kernel_size=(7, 7), gray_threshold=200):
     """Masks tissue in image. Uses gray-scaled image, as well as
     dilation kernels and 'gap filling'
     """

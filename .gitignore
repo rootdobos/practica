@@ -9,6 +9,7 @@ __pycache__/
 sandbox/train_images/
 sandbox/train_label_masks/
 sandbox/tiles/
+sandbox/modelcheckpoints/
 
 # Distribution / packaging
 .Python

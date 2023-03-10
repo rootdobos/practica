@@ -1,3 +1,9 @@
+whole slide:
+https://github.com/deroneriksson/python-wsi-preprocessing
+https://github.com/aetherAI/whole-slide-cnn
+https://github.com/szc19990412/TransMIL
+
+
 data analysis: 
 
 https://www.kaggle.com/code/rohitsingh9990/panda-eda-better-visualization-simple-baseline
@@ -21,6 +27,7 @@ tiles good:
 https://www.kaggle.com/code/rftexas/better-image-tiles-removing-white-spaces
 https://www.kaggle.com/code/akensert/panda-optimized-tiling-tf-data-dataset
 https://www.kaggle.com/code/dlarionov/tile-factory
+https://www.kaggle.com/code/vgarshin/panda-keras-baseline/notebook
 
 
 preprocess:
