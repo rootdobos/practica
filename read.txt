@@ -48,6 +48,7 @@ https://www.kaggle.com/code/vgarshin/panda-keras-timedistributed
 
 https://www.kaggle.com/code/micheomaano/pandas-42x256x256x3-inference
 
+
 quadratic weighted kappa:
 https://www.kaggle.com/code/prashant111/simple-explanation-of-quadratic-weighted-kappa
 

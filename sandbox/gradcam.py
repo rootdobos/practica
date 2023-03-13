@@ -13,16 +13,16 @@ warnings.filterwarnings('ignore')
 
 class config:
     seed = 2023
-    batch_size = 1
-    img_size = 256
-    num_tiles = 9
+    batch_size = 2
+    img_size = 128
+    num_tiles = 25
     num_classes = 6
     num_splits = 5
     num_epochs = 5
     learning_rate = 3e-3
     num_workers = 1
     verbose = True
-    backbone_train_path = 'tiles/512_3_3/'
+    backbone_train_path = 'tiles/128_5_5/'
     #backbone_test_path = '../input/prostate-cancer-grade-assessment/test_images/'
 
 def seed_everything(seed):
@@ -57,6 +57,7 @@ def make_gradcam_heatmap(img_array, model, last_conv_layer_name, classifier_laye
         tape.watch(last_conv_layer_output)
         
         preds = classifier_model(last_conv_layer_output)
+        print(preds)
         top_pred_index = tf.argmax(preds[0])
         top_class_channel = preds[:, top_pred_index]
         
@@ -70,13 +71,13 @@ def make_gradcam_heatmap(img_array, model, last_conv_layer_name, classifier_laye
     
     heatmap = np.mean(last_conv_layer_output, axis=-1)
     heatmap = np.maximum(heatmap, 0) / np.max(heatmap)
-    return heatmap
+    return heatmap, top_pred_index
 
-def create_superimposed_visualization(img, heatmap):
+def create_superimposed_visualization(img, heatmap, colormap):
     heatmap = cv2.resize(heatmap, (img.shape[1], img.shape[0]))
     
     heatmap = np.uint8(255*heatmap)
-    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_INFERNO)
+    heatmap = cv2.applyColorMap(heatmap,colormap )
     superimposed_img = heatmap * 0.4 + img
     
     return superimposed_img

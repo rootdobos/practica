@@ -10,22 +10,39 @@ from PIL import Image
 from openslide import OpenSlide
 import cv2
 import utils3
-
+import random
 IMG_DIR = 'train_images/'
 
+AUGMENTATION=4
 LAYER = 1
 SIZE = 128
 COLS = 5
 ROWS = 5
 N = COLS*ROWS
-TILES_DIR="tiles/{}_{}_{}".format(SIZE,COLS,ROWS)
+TILES_BASE_DIR="tiles/"
+TILES_DIR="{}{}_{}_{}_{}".format(TILES_BASE_DIR,SIZE,COLS,ROWS,AUGMENTATION)
 def process_image(idx):    
 
     im = utils3.imread(os.path.join(IMG_DIR, f"{idx}.tiff"), layer=LAYER)
     im = np.asarray(im)
-    im = akensert_tiles(im)
+    tiles = akensert_tiles(im)
+    im = join_tiles(tiles)
     im = Image.fromarray(im)
     im.save(os.path.join(TILES_DIR, f"{idx}.png"), format='PNG', quality=90)
+    
+    for i in range(AUGMENTATION):
+        np.random.shuffle(tiles)
+        for j in range(N):
+            rand=random.randrange(0,4)
+            if(rand==1):
+                tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_90_CLOCKWISE)
+            if(rand==2):
+                tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_90_COUNTERCLOCKWISE)
+            if(rand==3):
+                tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_180)
+        im = join_tiles(tiles)
+        im = Image.fromarray(im)
+        im.save(os.path.join(TILES_DIR, f"{idx}_{i}.png"), format='PNG', quality=90)
 
 def split_tiles(img:np.ndarray)->np.ndarray:
     reshaped = img.reshape(
@@ -117,7 +134,7 @@ def akensert_tiles(img:np.ndarray, debug=False)->np.ndarray:
             [[0,N-len(selected)],[0,0],[0,0],[0,0]],
             constant_values=255
         )
-    
+    return selected
     # merge tiles to one image
     merged = join_tiles(selected)
     
