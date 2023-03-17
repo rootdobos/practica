@@ -5,7 +5,7 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 import pandaGenerator
 import models
 
-from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, CSVLogger
 def train_model(config,model):
     
 
@@ -30,16 +30,19 @@ def train_model(config,model):
         apply_tfms=False,
         shuffle=False, 
     )
-
+    save_name=config.model_name
+    if(config.full_dataset):
+        save_name+="_full"
 
 
     cb1 = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=1, verbose=1, min_lr=1e-6)
-    cb2 = ModelCheckpoint("modelcheckpoints/{}/{}.h5".format(config.train_data_name,config.model_name), monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=False, mode='min')
+    cb2 = ModelCheckpoint("modelcheckpoints/{}/{}.h5".format(config.train_data_name,save_name), monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=False, mode='min')
+    history_logger=CSVLogger("modelcheckpoints/{}/{}_history.CSV".format(config.train_data_name,save_name), separator=",", append=False)
 
     history = model.fit_generator(
         train_datagen,
         validation_data=val_datagen,
-        callbacks=[cb1, cb2],
+        callbacks=[cb1, cb2,history_logger],
         epochs=config.num_epochs,
         verbose=1
     )

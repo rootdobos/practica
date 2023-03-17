@@ -11,8 +11,8 @@ from openslide import OpenSlide
 import cv2
 import utils3
 import random
-IMG_DIR = 'train_images/'
-TILES_BASE_DIR="tiles/"
+IMG_DIR = 'E:/data/prostate_cancer/train_images/'
+TILES_BASE_DIR="E:/data/prostate_cancer/tiles/"
 class TileExtractor:
     def __init__(self, layer, size, cols,rows,augmentation):
         self.layer = layer
@@ -24,7 +24,8 @@ class TileExtractor:
         self.tiles_dir="{}{}_{}_{}_{}".format(TILES_BASE_DIR,self.size,self.cols,self.rows,self.augmentation)
 
     def process_image(self,idx):    
-
+        if os.path.exists(os.path.join(self.tiles_dir, f"{idx}.png")):
+            return
         im = utils3.imread(os.path.join(IMG_DIR, f"{idx}.tiff"), layer=self.layer)
         im = np.asarray(im)
         tiles = self.akensert_tiles(im)

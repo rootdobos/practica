@@ -1,3 +1,9 @@
+IMG_SIZE=128
+BATCH_SIZE=2
+NUM_TILES=16
+EPOCHS=5
+TRAIN_DATA_NAME="128_4_4_0"
+FULL_DATASET=True
 class config:
     def __init__(self, 
             model_name,
@@ -13,9 +19,9 @@ class config:
             verbose ,
             train_data_name,
             last_conv_layer_name,
-            classifier_layer_names):
-        self.train_data_name=train_data_name
-        self.backbone_train_path='tiles/{}/'.format(train_data_name)
+            classifier_layer_names,
+            full_dataset=True):
+        self.train_data_name=train_data_name 
         self.model_name=model_name
         self.seed = seed
         self.batch_size = batch_size
@@ -27,61 +33,67 @@ class config:
         self.learning_rate = learning_rate
         self.num_workers = num_workers
         self.verbose = verbose
-        self.train_csv = "tiles/{}.csv".format(train_data_name)
+        self.full_dataset=full_dataset
+        if full_dataset:
+            self.train_csv = "E:/data/prostate_cancer/tiles/{}.csv".format(train_data_name)
+            self.backbone_train_path='E:/data/prostate_cancer/tiles/{}/'.format(train_data_name)
+        else:
+            self.train_csv = "tiles/{}.csv".format(train_data_name)
+            self.backbone_train_path='tiles/{}/'.format(train_data_name)
         self.last_conv_layer_name=last_conv_layer_name
         self.classifier_layer_names=classifier_layer_names
         #backbone_test_path = '../input/prostate-cancer-grade-assessment/test_images/'
 
 seresnext50_config= config(seed = 2023,
                 model_name="seresnext50",
-                batch_size = 4,
-                img_size = 64,
-                num_tiles = 16,
+                batch_size = BATCH_SIZE,
+                img_size = IMG_SIZE,
+                num_tiles = NUM_TILES,
                 num_classes = 6,
                 num_splits = 5,
-                num_epochs = 15,
+                num_epochs = EPOCHS,
                 learning_rate = 3e-3,
                 num_workers = 1,
                 verbose = True,
-                train_data_name="64_4_4_0",
+                train_data_name=TRAIN_DATA_NAME,
                 last_conv_layer_name = 'activation_80',
                 classifier_layer_names = [
-                    'global_average_pooling2d_16',
-                    'dense'
+                    'global_average_pooling2d_18',
+                    'dense_2'
                     ]
                 )
 vgg16_config= config(seed = 2023,
                 model_name="vgg16",
-                batch_size = 4,
-                img_size = 64,
-                num_tiles = 16,
+                batch_size = BATCH_SIZE,
+                img_size = IMG_SIZE,
+                num_tiles = NUM_TILES,
                 num_classes = 6,
                 num_splits = 5,
-                num_epochs = 15,
+                num_epochs = EPOCHS,
                 learning_rate = 3e-3,
                 num_workers = 1,
                 verbose = True,
-                train_data_name="64_4_4_0",
+                train_data_name=TRAIN_DATA_NAME,
                 last_conv_layer_name = 'block5_pool',
                 classifier_layer_names = [
-                    'global_average_pooling2d',
-                    'dense',
-                    'batch_normalization',
-                    'dense_1'
+                    'global_average_pooling2d_19',
+                    'dense_3',
+                    'batch_normalization_53',
+                    'dense_4'
                     ]
                 )
 densenet121_config= config(seed = 2023,
                 model_name="densenet121",
-                batch_size = 4,
-                img_size = 64,
-                num_tiles = 16,
+                batch_size = BATCH_SIZE,
+                img_size = IMG_SIZE,
+                num_tiles = NUM_TILES,
                 num_classes = 6,
                 num_splits = 5,
-                num_epochs = 15,
+                num_epochs = EPOCHS,
                 learning_rate = 3e-3,
                 num_workers = 1,
                 verbose = True,
-                train_data_name="64_4_4_0",
+                train_data_name=TRAIN_DATA_NAME,
                 last_conv_layer_name = 'relu',
                 classifier_layer_names = [
                     'global_average_pooling2d',
@@ -92,16 +104,17 @@ densenet121_config= config(seed = 2023,
 
 efficientNetB2_config= config(seed = 2023,
                 model_name="efficientNetB2",
-                batch_size = 4,
-                img_size = 64,
-                num_tiles = 16,
+                batch_size = BATCH_SIZE,
+                img_size = IMG_SIZE,
+                num_tiles = NUM_TILES,
                 num_classes = 6,
                 num_splits = 5,
-                num_epochs = 15,
+                num_epochs = EPOCHS,
                 learning_rate = 3e-3,
                 num_workers = 1,
                 verbose = True,
-                train_data_name="64_4_4_0",
+                train_data_name=TRAIN_DATA_NAME,
+                full_dataset=FULL_DATASET,
                 last_conv_layer_name = 'top_activation',
                 classifier_layer_names = [
                     'global_average_pooling2d',
