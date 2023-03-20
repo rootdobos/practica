@@ -1,9 +1,9 @@
 IMG_SIZE=128
 BATCH_SIZE=2
-NUM_TILES=16
-EPOCHS=5
-TRAIN_DATA_NAME="128_4_4_0"
-FULL_DATASET=True
+NUM_TILES=25
+EPOCHS=15
+TRAIN_DATA_NAME="0_128_5_5_2"
+FULL_DATASET=False
 class config:
     def __init__(self, 
             model_name,
@@ -56,6 +56,7 @@ seresnext50_config= config(seed = 2023,
                 num_workers = 1,
                 verbose = True,
                 train_data_name=TRAIN_DATA_NAME,
+                full_dataset=FULL_DATASET,
                 last_conv_layer_name = 'activation_80',
                 classifier_layer_names = [
                     'global_average_pooling2d_18',
@@ -74,6 +75,7 @@ vgg16_config= config(seed = 2023,
                 num_workers = 1,
                 verbose = True,
                 train_data_name=TRAIN_DATA_NAME,
+                full_dataset=FULL_DATASET,
                 last_conv_layer_name = 'block5_pool',
                 classifier_layer_names = [
                     'global_average_pooling2d_19',
@@ -94,6 +96,7 @@ densenet121_config= config(seed = 2023,
                 num_workers = 1,
                 verbose = True,
                 train_data_name=TRAIN_DATA_NAME,
+                full_dataset=FULL_DATASET,
                 last_conv_layer_name = 'relu',
                 classifier_layer_names = [
                     'global_average_pooling2d',

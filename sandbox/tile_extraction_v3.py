@@ -13,6 +13,8 @@ import utils3
 import random
 IMG_DIR = 'E:/data/prostate_cancer/train_images/'
 TILES_BASE_DIR="E:/data/prostate_cancer/tiles/"
+# IMG_DIR = 'train_images/'
+# TILES_BASE_DIR="tiles/"
 class TileExtractor:
     def __init__(self, layer, size, cols,rows,augmentation):
         self.layer = layer
@@ -21,7 +23,7 @@ class TileExtractor:
         self.rows=rows
         self.n=cols*rows
         self.augmentation=augmentation
-        self.tiles_dir="{}{}_{}_{}_{}".format(TILES_BASE_DIR,self.size,self.cols,self.rows,self.augmentation)
+        self.tiles_dir="{}{}_{}_{}_{}_{}".format(TILES_BASE_DIR,self.layer,self.size,self.cols,self.rows,self.augmentation)
 
     def process_image(self,idx):    
         if os.path.exists(os.path.join(self.tiles_dir, f"{idx}.png")):
