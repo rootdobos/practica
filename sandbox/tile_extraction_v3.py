@@ -11,6 +11,10 @@ from openslide import OpenSlide
 import cv2
 import utils3
 import random
+from openslide import open_slide
+import openslide
+from openslide.deepzoom import DeepZoomGenerator
+import uuid
 IMG_DIR = 'E:/data/prostate_cancer/train_images/'
 TILES_BASE_DIR="E:/data/prostate_cancer/tiles/"
 # IMG_DIR = 'train_images/'
@@ -28,9 +32,9 @@ class TileExtractor:
     def process_image(self,idx):    
         if os.path.exists(os.path.join(self.tiles_dir, f"{idx}.png")):
             return
-        im = utils3.imread(os.path.join(IMG_DIR, f"{idx}.tiff"), layer=self.layer)
-        im = np.asarray(im)
-        tiles = self.akensert_tiles(im)
+        #im = utils3.imread(os.path.join(IMG_DIR, f"{idx}.tiff"), layer=self.layer)
+        slide=open_slide( os.path.join(IMG_DIR, f"{idx}.tiff")) 
+        tiles = self.akensert_tiles(slide)
         im = self.join_tiles(tiles)
         im = Image.fromarray(im)
         im.save(os.path.join(self.tiles_dir, f"{idx}.png"), format='PNG', quality=90)
@@ -110,26 +114,48 @@ class TileExtractor:
 
     #     return merged
 
-    def akensert_tiles(self,img:np.ndarray, debug=False)->np.ndarray:    
+    def akensert_tiles(self,slide, debug=False)->np.ndarray:    
         # get tile coords
-        img, coords = utils3.compute_coords(
-            img,
-            patch_size=self.size,
-            precompute=False, # returns new padded img
+        downsampled_image=slide.read_region((0,0),2, slide.level_dimensions[2])
+        downsampled_image= downsampled_image.convert('RGB')
+        downsampled_image = np.array(downsampled_image)
+        scaled_patch_size=int( self.size/slide.level_downsamples[2])
+        coords = utils3.compute_coords(
+            downsampled_image,
+            patch_size=scaled_patch_size,
+            precompute=True, # returns new padded img
             min_patch_info=0.35,
             min_axis_info=0.35,
             min_consec_axis_info=0.35,
             min_decimal_keep=0.7)
         # sort coords (high info -> low info)
         coords = sorted(coords, key= lambda x: x[0], reverse=False)
-        
+        zoom_tiles= DeepZoomGenerator(slide,tile_size=self.size,overlap=0,limit_bounds=False)
         # select top N tiles
+        level_num = zoom_tiles.level_count-1
+        
         tiles = []
         for i in range(len(coords)):
             if i == self.n:
                 break;
             _, x, y = coords[i]
-            tiles.append(img[x:x+self.size,y:y+self.size])
+            scaled_row=int(x*slide.level_downsamples[2]/self.size)
+            scaled_col=int(y*slide.level_downsamples[2]/self.size)
+
+            temp_tile=zoom_tiles.get_tile(level_num,(scaled_col,scaled_row))
+
+            temp_tile_RGB = temp_tile.convert('RGB')
+            temp_tile_np = np.array(temp_tile_RGB)
+            correction_x=self.size-temp_tile_np.shape[0]
+            correction_y=self.size-temp_tile_np.shape[1]
+            if(correction_y>0 or correction_x>0):
+                # id=uuid.uuid4().hex
+                # im = Image.fromarray(temp_tile_np)
+                # im.save(os.path.join("C:/tmp/tiles_bug", f"{id}_orig.png"), format='PNG', quality=90)
+                temp_tile_np=np.pad(temp_tile_np,((0,correction_x),(0,correction_y), (0,0)),'maximum')
+                # im = Image.fromarray(temp_tile_np)
+                # im.save(os.path.join("C:/tmp/tiles_bug", f"{id}_padded.png"), format='PNG', quality=90)
+            tiles.append(temp_tile_np)
         
         # append white tiles if necessary
         selected = np.array(tiles)
