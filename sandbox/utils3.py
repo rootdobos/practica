@@ -5,7 +5,7 @@ import math
 from PIL import Image
 from openslide import OpenSlide
 import cv2
-
+import matplotlib.pyplot as plt
 
 def enhance_image(image, contrast=1, brightness=15):
     """
@@ -261,3 +261,27 @@ def imread(path:str, layer:int)->Image:
         im = slide.read_region((0,0), layer, slide.level_dimensions[layer])
         im = im.convert('RGB') # drops A
         return im
+
+def show_downsampled_and_original_tiles(positions,tiles,down_tiles, down_tile_level_corresponding_level,number_of_tiles=64):
+    
+    sqrt_tiles= int(number_of_tiles ** 0.5)
+
+    plot_tiles(number_of_tiles,sqrt_tiles,down_tiles,positions,down_tile_level_corresponding_level)
+    #plot_tiles(number_of_tiles,sqrt_tiles,tiles,positions,len(tiles.level_tiles)-1)
+
+
+def plot_tiles(number_of_tiles,sqrt_tiles,tiles,positions,level):
+    fig, ax = plt.subplots(figsize=(25, 25), ncols=sqrt_tiles, nrows=sqrt_tiles)
+    for i in range(number_of_tiles):
+        x,y=i//sqrt_tiles,i%sqrt_tiles
+        temp_tile = tiles.get_tile(level, positions[i])
+        temp_tile_RGB = temp_tile.convert('RGB')
+        tmp_np=np.array(temp_tile_RGB)
+        tmp_gray= cv2.cvtColor(tmp_np,cv2.COLOR_RGB2GRAY)
+        tmp_laplacian=cv2.Laplacian(tmp_gray,cv2.CV_16S,ksize=3)
+        abs_dst = cv2.convertScaleAbs(tmp_laplacian)
+        ax[x][y].set_axis_off()
+        ax[x][y].imshow(tmp_np)
+        #ax[x][y].set_title('s:{:.0f},a:{:.0f},S:{:.0f},A:{:.0f},M:{:.0f}'.format(np.std(abs_dst),np.mean(abs_dst),np.std(tmp_gray),np.mean(tmp_gray),np.median( tmp_gray)))
+        ax[x][y].set_title('a:{:.0f},S:{:.0f},A:{:.0f},M:{:.0f}'.format(np.mean(abs_dst),np.std(tmp_gray),np.mean(tmp_gray),np.median( tmp_gray)))
+    plt.show()

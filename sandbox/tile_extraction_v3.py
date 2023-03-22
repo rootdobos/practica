@@ -34,24 +34,25 @@ class TileExtractor:
             return
         #im = utils3.imread(os.path.join(IMG_DIR, f"{idx}.tiff"), layer=self.layer)
         slide=open_slide( os.path.join(IMG_DIR, f"{idx}.tiff")) 
-        tiles = self.akensert_tiles(slide)
-        im = self.join_tiles(tiles)
-        im = Image.fromarray(im)
-        im.save(os.path.join(self.tiles_dir, f"{idx}.png"), format='PNG', quality=90)
+        self.pyramid_tiles(slide,16,220,210)
+        # tiles = self.akensert_tiles(slide)
+        # im = self.join_tiles(tiles)
+        # im = Image.fromarray(im)
+        # im.save(os.path.join(self.tiles_dir, f"{idx}.png"), format='PNG', quality=90)
         
-        for i in range(self.augmentation):
-            np.random.shuffle(tiles)
-            for j in range(self.n):
-                rand=random.randrange(0,4)
-                if(rand==1):
-                    tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_90_CLOCKWISE)
-                if(rand==2):
-                    tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_90_COUNTERCLOCKWISE)
-                if(rand==3):
-                    tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_180)
-            im = self.join_tiles(tiles)
-            im = Image.fromarray(im)
-            im.save(os.path.join(self.tiles_dir, f"{idx}_{i}.png"), format='PNG', quality=90)
+        # for i in range(self.augmentation):
+        #     np.random.shuffle(tiles)
+        #     for j in range(self.n):
+        #         rand=random.randrange(0,4)
+        #         if(rand==1):
+        #             tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_90_CLOCKWISE)
+        #         if(rand==2):
+        #             tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_90_COUNTERCLOCKWISE)
+        #         if(rand==3):
+        #             tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_180)
+        #     im = self.join_tiles(tiles)
+        #     im = Image.fromarray(im)
+        #     im.save(os.path.join(self.tiles_dir, f"{idx}_{i}.png"), format='PNG', quality=90)
 
     # def split_tiles(img:np.ndarray)->np.ndarray:
     #     reshaped = img.reshape(
@@ -133,7 +134,6 @@ class TileExtractor:
         zoom_tiles= DeepZoomGenerator(slide,tile_size=self.size,overlap=0,limit_bounds=False)
         # select top N tiles
         level_num = zoom_tiles.level_count-1
-        
         tiles = []
         for i in range(len(coords)):
             if i == self.n:
@@ -177,3 +177,42 @@ class TileExtractor:
             return merged, img
         else:
             return merged
+    def pyramid_tiles(self, slide, factor,avg_threshold,median_threshold):
+        down_size=int( self.size/factor)
+        down_tiles= DeepZoomGenerator(slide,tile_size=down_size,overlap=0,limit_bounds=False)
+        tiles= DeepZoomGenerator(slide,tile_size=self.size,overlap=0,limit_bounds=False)
+        
+        tiles_shape= tiles.level_tiles[len(tiles.level_tiles)-1]
+        cols, rows= tiles_shape
+        down_tile_level_corresponding_level=down_tiles.level_tiles.index(tiles_shape)
+        positions= []
+        positions_non_full=[]
+        positions_queue=[]
+        for row in range(rows):
+            for col in range(cols):
+                temp_tile = down_tiles.get_tile(down_tile_level_corresponding_level, (col, row))
+                temp_tile_RGB = temp_tile.convert('RGB')
+                temp_tile_np = np.array(temp_tile_RGB)
+                mean_colors=np.mean(temp_tile,axis=(0,1))
+                mean_img=np.mean(mean_colors)
+                tmp_gray= cv2.cvtColor(temp_tile_np,cv2.COLOR_RGB2GRAY)
+                median_img= np.median(tmp_gray)
+                if mean_img<avg_threshold:
+                    if(temp_tile_np.shape[0]!=down_size or temp_tile_np.shape[1]!=down_size):
+                        positions_non_full.append((col,row))
+                    elif(median_img>median_threshold):
+                        positions_queue.append((col,row))
+                    else:
+                        positions.append((col,row))
+                        
+        if positions<self.n:
+            positions.extend(positions_queue) 
+        print(len(positions))
+        print(len(positions_queue))
+        print(len(positions_non_full))
+        utils3.show_downsampled_and_original_tiles(positions,tiles,down_tiles,down_tile_level_corresponding_level,36)
+
+
+
+
+        
