@@ -34,11 +34,12 @@ class TileExtractor:
             return
         #im = utils3.imread(os.path.join(IMG_DIR, f"{idx}.tiff"), layer=self.layer)
         slide=open_slide( os.path.join(IMG_DIR, f"{idx}.tiff")) 
-        self.pyramid_tiles(slide,16,220,210)
+        #print(idx)
+        tiles=self.pyramid_tiles(slide,16,220,210)
         # tiles = self.akensert_tiles(slide)
-        # im = self.join_tiles(tiles)
-        # im = Image.fromarray(im)
-        # im.save(os.path.join(self.tiles_dir, f"{idx}.png"), format='PNG', quality=90)
+        im = self.join_tiles(tiles)
+        im = Image.fromarray(im)
+        im.save(os.path.join(self.tiles_dir, f"{idx}.png"), format='PNG', quality=90)
         
         # for i in range(self.augmentation):
         #     np.random.shuffle(tiles)
@@ -188,8 +189,12 @@ class TileExtractor:
         positions= []
         positions_non_full=[]
         positions_queue=[]
-        for row in range(rows):
-            for col in range(cols):
+        # print(down_tile_level_corresponding_level)
+        # print(cols)
+        # print(rows)
+        for row in range(1,rows-1):
+            for col in range(1,cols-1):
+                #print("{},{}".format(row,col))
                 temp_tile = down_tiles.get_tile(down_tile_level_corresponding_level, (col, row))
                 temp_tile_RGB = temp_tile.convert('RGB')
                 temp_tile_np = np.array(temp_tile_RGB)
@@ -198,15 +203,42 @@ class TileExtractor:
                 tmp_gray= cv2.cvtColor(temp_tile_np,cv2.COLOR_RGB2GRAY)
                 median_img= np.median(tmp_gray)
                 if mean_img<avg_threshold:
+                    std=np.std(tmp_gray)
+                    data=[(col,row),std]
                     if(temp_tile_np.shape[0]!=down_size or temp_tile_np.shape[1]!=down_size):
-                        positions_non_full.append((col,row))
+                        positions_non_full.append(data)
                     elif(median_img>median_threshold):
-                        positions_queue.append((col,row))
+                        positions_queue.append(data)
                     else:
-                        positions.append((col,row))
+                        positions.append(data)
                         
-        if positions<self.n:
+        if len(positions)<self.n:
             positions.extend(positions_queue) 
+        positions=sorted(positions, key= lambda x: x[1], reverse=False)
+        out_tiles=[]
+        for i in range(len(positions)):
+            if i == self.n:
+                break;
+            coord, std = positions[i]
+
+            temp_tile=tiles.get_tile(len(tiles.level_tiles)-1,coord)
+
+            temp_tile_RGB = temp_tile.convert('RGB')
+            temp_tile_np = np.array(temp_tile_RGB)
+            
+            out_tiles.append(temp_tile_np)
+
+        # append white tiles if necessary
+        selected = np.array(out_tiles)
+        #print(selected.shape)
+        if len(selected)<self.n:
+            selected = np.pad(
+                selected,
+                [[0,self.n-len(selected)],[0,0],[0,0],[0,0]],
+                constant_values=255
+            )
+        return selected
+    
         print(len(positions))
         print(len(positions_queue))
         print(len(positions_non_full))

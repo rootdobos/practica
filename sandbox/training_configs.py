@@ -1,9 +1,12 @@
 IMG_SIZE=128
-BATCH_SIZE=2
-NUM_TILES=25
-EPOCHS=15
-TRAIN_DATA_NAME="0_128_5_5_2"
-FULL_DATASET=False
+BATCH_SIZE=1
+NUM_TILES=36
+EPOCHS=5
+LEARNING_RATE=3e-4
+TRAIN_DATA_NAME="0_192_6_6_0"
+FULL_DATASET=True
+IMAGE_PATH=""
+TRAIN_CSV="E:/data/prostate_cancer/train.csv"
 class config:
     def __init__(self, 
             model_name,
@@ -20,7 +23,9 @@ class config:
             train_data_name,
             last_conv_layer_name,
             classifier_layer_names,
-            full_dataset=True):
+            full_dataset=True,
+            image_path="",
+            train_csv_name=""):
         self.train_data_name=train_data_name 
         self.model_name=model_name
         self.seed = seed
@@ -40,6 +45,10 @@ class config:
         else:
             self.train_csv = "tiles/{}.csv".format(train_data_name)
             self.backbone_train_path='tiles/{}/'.format(train_data_name)
+        if(image_path!=""):
+            self.backbone_train_path=image_path
+        if(train_csv_name!=""):
+            self.train_csv=train_csv_name
         self.last_conv_layer_name=last_conv_layer_name
         self.classifier_layer_names=classifier_layer_names
         #backbone_test_path = '../input/prostate-cancer-grade-assessment/test_images/'
@@ -52,7 +61,7 @@ seresnext50_config= config(seed = 2023,
                 num_classes = 6,
                 num_splits = 5,
                 num_epochs = EPOCHS,
-                learning_rate = 3e-3,
+                learning_rate = LEARNING_RATE,
                 num_workers = 1,
                 verbose = True,
                 train_data_name=TRAIN_DATA_NAME,
@@ -61,7 +70,8 @@ seresnext50_config= config(seed = 2023,
                 classifier_layer_names = [
                     'global_average_pooling2d_18',
                     'dense_2'
-                    ]
+                    ],
+                train_csv_name=TRAIN_CSV
                 )
 vgg16_config= config(seed = 2023,
                 model_name="vgg16",
@@ -71,7 +81,7 @@ vgg16_config= config(seed = 2023,
                 num_classes = 6,
                 num_splits = 5,
                 num_epochs = EPOCHS,
-                learning_rate = 3e-3,
+                learning_rate = LEARNING_RATE,
                 num_workers = 1,
                 verbose = True,
                 train_data_name=TRAIN_DATA_NAME,
@@ -82,7 +92,8 @@ vgg16_config= config(seed = 2023,
                     'dense_3',
                     'batch_normalization_53',
                     'dense_4'
-                    ]
+                    ],
+                train_csv_name=TRAIN_CSV
                 )
 densenet121_config= config(seed = 2023,
                 model_name="densenet121",
@@ -92,7 +103,7 @@ densenet121_config= config(seed = 2023,
                 num_classes = 6,
                 num_splits = 5,
                 num_epochs = EPOCHS,
-                learning_rate = 3e-3,
+                learning_rate = LEARNING_RATE,
                 num_workers = 1,
                 verbose = True,
                 train_data_name=TRAIN_DATA_NAME,
@@ -102,7 +113,8 @@ densenet121_config= config(seed = 2023,
                     'global_average_pooling2d',
                     'dropout',
                     'dense'
-                    ]
+                    ],
+                train_csv_name=TRAIN_CSV
                 )
 
 efficientNetB2_config= config(seed = 2023,
@@ -113,7 +125,7 @@ efficientNetB2_config= config(seed = 2023,
                 num_classes = 6,
                 num_splits = 5,
                 num_epochs = EPOCHS,
-                learning_rate = 3e-3,
+                learning_rate = LEARNING_RATE,
                 num_workers = 1,
                 verbose = True,
                 train_data_name=TRAIN_DATA_NAME,
@@ -123,5 +135,6 @@ efficientNetB2_config= config(seed = 2023,
                     'global_average_pooling2d',
                     'dropout',
                     'dense'
-                    ]
+                    ],
+                train_csv_name=TRAIN_CSV
                 )

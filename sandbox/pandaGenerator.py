@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.utils import Sequence
 import gradcam
-
+import cv2
 from tqdm.notebook import tqdm
 import albumentations
 
@@ -22,7 +22,7 @@ class PANDAGenerator(Sequence):
         self.apply_tfms = apply_tfms
         
         self.side = int(self.config.num_tiles ** 0.5)
-        
+        self.input_size= (self.config.img_size*self.side,self.config.img_size*self.side,3)
         self.tfms = albumentations.Compose([
             albumentations.HorizontalFlip(p=0.5),
             albumentations.VerticalFlip(p=0.5),
@@ -47,11 +47,15 @@ class PANDAGenerator(Sequence):
         imgs_batch = self.image_ids[index * self.config.batch_size : (index + 1) * self.config.batch_size]
         
         for i, img_name in enumerate(imgs_batch):
-            img_path = '{}/{}.png'.format(self.config.backbone_train_path, img_name)
-            image= tf.keras.preprocessing.image.load_img(path=img_path,grayscale=False,color_mode="rgb",target_size=(self.config.img_size*self.side,self.config.img_size*self.side),interpolation='nearest')
-            input=tf.keras.preprocessing.image.img_to_array(image)
-            X[i, ]=input/255.0
-            
+            try:
+                img_path = '{}/{}.png'.format(self.config.backbone_train_path, img_name)
+                image= tf.keras.preprocessing.image.load_img(path=img_path,grayscale=False,color_mode="rgb",target_size=(self.config.img_size*self.side,self.config.img_size*self.side),interpolation='nearest')
+                input=tf.keras.preprocessing.image.img_to_array(image)
+                if(input.shape!=self.input_size):
+                    input=cv2.resize(input,self.input_size,interpolation=cv2.INTER_LANCZOS4)
+                X[i, ]=input/255.0
+            except:
+                print(img_name)
         if self.mode == 'fit':
             y = np.zeros((self.config.batch_size, self.config.num_classes), dtype=np.float32)
             lbls_batch = self.labels[index * self.config.batch_size : (index + 1) * self.config.batch_size]

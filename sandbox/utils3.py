@@ -267,14 +267,14 @@ def show_downsampled_and_original_tiles(positions,tiles,down_tiles, down_tile_le
     sqrt_tiles= int(number_of_tiles ** 0.5)
 
     plot_tiles(number_of_tiles,sqrt_tiles,down_tiles,positions,down_tile_level_corresponding_level)
-    #plot_tiles(number_of_tiles,sqrt_tiles,tiles,positions,len(tiles.level_tiles)-1)
+    plot_tiles(number_of_tiles,sqrt_tiles,tiles,positions,len(tiles.level_tiles)-1)
 
 
 def plot_tiles(number_of_tiles,sqrt_tiles,tiles,positions,level):
     fig, ax = plt.subplots(figsize=(25, 25), ncols=sqrt_tiles, nrows=sqrt_tiles)
     for i in range(number_of_tiles):
         x,y=i//sqrt_tiles,i%sqrt_tiles
-        temp_tile = tiles.get_tile(level, positions[i])
+        temp_tile = tiles.get_tile(level, positions[i][0])
         temp_tile_RGB = temp_tile.convert('RGB')
         tmp_np=np.array(temp_tile_RGB)
         tmp_gray= cv2.cvtColor(tmp_np,cv2.COLOR_RGB2GRAY)
@@ -285,3 +285,13 @@ def plot_tiles(number_of_tiles,sqrt_tiles,tiles,positions,level):
         #ax[x][y].set_title('s:{:.0f},a:{:.0f},S:{:.0f},A:{:.0f},M:{:.0f}'.format(np.std(abs_dst),np.mean(abs_dst),np.std(tmp_gray),np.mean(tmp_gray),np.median( tmp_gray)))
         ax[x][y].set_title('a:{:.0f},S:{:.0f},A:{:.0f},M:{:.0f}'.format(np.mean(abs_dst),np.std(tmp_gray),np.mean(tmp_gray),np.median( tmp_gray)))
     plt.show()
+
+def resize(file):
+    if (os.path.exists("E:/data/prostate_cancer/tiles/0_192_6_6_0/{}.png".format(file))):
+        return
+    try:
+        img=cv2.imread("E:/data/prostate_cancer/tiles/0_512_6_6_0/{}.png".format(file),cv2.IMREAD_UNCHANGED)
+        img_resized= cv2.resize(img,(192*6,192*6),interpolation=cv2.INTER_LANCZOS4)
+        cv2.imwrite("E:/data/prostate_cancer/tiles/0_192_6_6_0/{}.png".format(file),img_resized)
+    except:
+        print(file)
