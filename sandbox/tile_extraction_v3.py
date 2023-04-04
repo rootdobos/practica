@@ -37,23 +37,23 @@ class TileExtractor:
         #print(idx)
         tiles=self.pyramid_tiles(slide,16,220,210)
         # tiles = self.akensert_tiles(slide)
-        im = self.join_tiles(tiles)
+        im = self.join_tiles(tiles[:self.n])
         im = Image.fromarray(im)
         im.save(os.path.join(self.tiles_dir, f"{idx}.png"), format='PNG', quality=90)
         
-        # for i in range(self.augmentation):
-        #     np.random.shuffle(tiles)
-        #     for j in range(self.n):
-        #         rand=random.randrange(0,4)
-        #         if(rand==1):
-        #             tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_90_CLOCKWISE)
-        #         if(rand==2):
-        #             tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_90_COUNTERCLOCKWISE)
-        #         if(rand==3):
-        #             tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_180)
-        #     im = self.join_tiles(tiles)
-        #     im = Image.fromarray(im)
-        #     im.save(os.path.join(self.tiles_dir, f"{idx}_{i}.png"), format='PNG', quality=90)
+        for i in range(self.augmentation):
+            np.random.shuffle(tiles)
+            for j in range(self.n):
+                rand=random.randrange(0,4)
+                if(rand==1):
+                    tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_90_CLOCKWISE)
+                if(rand==2):
+                    tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_90_COUNTERCLOCKWISE)
+                if(rand==3):
+                    tiles[j]= cv2.rotate(tiles[j],cv2.ROTATE_180)
+            im = self.join_tiles(tiles[:self.n])
+            im = Image.fromarray(im)
+            im.save(os.path.join(self.tiles_dir, f"{idx}_{i}.png"), format='PNG', quality=90)
 
     # def split_tiles(img:np.ndarray)->np.ndarray:
     #     reshaped = img.reshape(
@@ -217,8 +217,8 @@ class TileExtractor:
         positions=sorted(positions, key= lambda x: x[1], reverse=False)
         out_tiles=[]
         for i in range(len(positions)):
-            if i == self.n:
-                break;
+            # if i == self.n:
+            #     break;
             coord, std = positions[i]
 
             temp_tile=tiles.get_tile(len(tiles.level_tiles)-1,coord)
