@@ -4,16 +4,31 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 
 import pandaGenerator
 import models
-
+import numpy as np
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, CSVLogger
 def train_model(config,model):
     
 
     gradcam.seed_everything(config.seed)
 
+    skf= StratifiedKFold(5, shuffle=True,random_state=42)
+
     df = pd.read_csv(config.train_csv)
     df = df.sample(frac=1, random_state=config.seed).reset_index(drop=True)
-    train_df, valid_df = train_test_split(df, test_size=0.2, random_state=config.seed)
+
+    df['fold']= -1
+
+    for i, (train_idx, valid_idx) in enumerate(skf.split(df, df['isup_grade'])):
+        df.loc[valid_idx, 'fold'] = i    
+
+    fold=0    
+
+    train_idx = np.where((df['fold'] != fold))[0]
+    valid_idx = np.where((df['fold'] == fold))[0]
+
+    train_df  = df.loc[train_idx]
+    valid_df = df.loc[valid_idx]
+    #train_df, valid_df = train_test_split(df, test_size=0.2, random_state=config.seed)
 
     train_datagen = pandaGenerator.PANDAGenerator(
         df=train_df, 
