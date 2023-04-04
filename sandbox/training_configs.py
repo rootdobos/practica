@@ -1,12 +1,13 @@
-IMG_SIZE=128
-BATCH_SIZE=1
+IMG_SIZE=64
+BATCH_SIZE=2
 NUM_TILES=36
-EPOCHS=5
+EPOCHS=11
+NUM_CLASSES=6
 LEARNING_RATE=3e-4
-TRAIN_DATA_NAME="0_192_6_6_0"
+TRAIN_DATA_NAME="0_256_6_6_4"
 FULL_DATASET=True
 IMAGE_PATH=""
-TRAIN_CSV="E:/data/prostate_cancer/train.csv"
+TRAIN_CSV=""
 class config:
     def __init__(self, 
             model_name,
@@ -58,7 +59,7 @@ seresnext50_config= config(seed = 2023,
                 batch_size = BATCH_SIZE,
                 img_size = IMG_SIZE,
                 num_tiles = NUM_TILES,
-                num_classes = 6,
+                num_classes = NUM_CLASSES,
                 num_splits = 5,
                 num_epochs = EPOCHS,
                 learning_rate = LEARNING_RATE,
@@ -68,8 +69,8 @@ seresnext50_config= config(seed = 2023,
                 full_dataset=FULL_DATASET,
                 last_conv_layer_name = 'activation_80',
                 classifier_layer_names = [
-                    'global_average_pooling2d_18',
-                    'dense_2'
+                    'global_average_pooling2d_16',
+                    'dense'
                     ],
                 train_csv_name=TRAIN_CSV
                 )
@@ -78,7 +79,7 @@ vgg16_config= config(seed = 2023,
                 batch_size = BATCH_SIZE,
                 img_size = IMG_SIZE,
                 num_tiles = NUM_TILES,
-                num_classes = 6,
+                num_classes = NUM_CLASSES,
                 num_splits = 5,
                 num_epochs = EPOCHS,
                 learning_rate = LEARNING_RATE,
@@ -100,7 +101,7 @@ densenet121_config= config(seed = 2023,
                 batch_size = BATCH_SIZE,
                 img_size = IMG_SIZE,
                 num_tiles = NUM_TILES,
-                num_classes = 6,
+                num_classes = NUM_CLASSES,
                 num_splits = 5,
                 num_epochs = EPOCHS,
                 learning_rate = LEARNING_RATE,
@@ -122,7 +123,7 @@ efficientNetB2_config= config(seed = 2023,
                 batch_size = BATCH_SIZE,
                 img_size = IMG_SIZE,
                 num_tiles = NUM_TILES,
-                num_classes = 6,
+                num_classes = NUM_CLASSES,
                 num_splits = 5,
                 num_epochs = EPOCHS,
                 learning_rate = LEARNING_RATE,
@@ -134,7 +135,8 @@ efficientNetB2_config= config(seed = 2023,
                 classifier_layer_names = [
                     'global_average_pooling2d',
                     'dropout',
-                    'dense'
+                    'dense',
+                    'dense_1'
                     ],
                 train_csv_name=TRAIN_CSV
                 )
