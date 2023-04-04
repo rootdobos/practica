@@ -10,7 +10,7 @@ sandbox/train_images/
 sandbox/train_label_masks/
 sandbox/tiles/
 sandbox/modelcheckpoints/
-
+sandbox/gradcam_images
 # Distribution / packaging
 .Python
 build/
