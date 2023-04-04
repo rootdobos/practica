@@ -1,5 +1,7 @@
 import numpy as np
 import os, gc, time, random
+import uuid
+
 
 import tensorflow as tf
 from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout, Input, Flatten, BatchNormalization
@@ -46,10 +48,10 @@ def make_gradcam_heatmap(img_array, model, last_conv_layer_name, classifier_laye
         
         preds = classifier_model(last_conv_layer_output)
         print(preds)
-        top_pred_index = tf.argmax(preds[0])
-        top_class_channel = preds[:, top_pred_index]
+        # top_pred_index = tf.argmax(preds[0])
+        # top_class_channel = preds[:, top_pred_index]
         
-    grads = tape.gradient(top_class_channel, last_conv_layer_output)
+    grads = tape.gradient(preds, last_conv_layer_output)
     pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
     
     last_conv_layer_output = last_conv_layer_output.numpy()[0]
@@ -59,14 +61,45 @@ def make_gradcam_heatmap(img_array, model, last_conv_layer_name, classifier_laye
     
     heatmap = np.mean(last_conv_layer_output, axis=-1)
     heatmap = np.maximum(heatmap, 0) / np.max(heatmap)
-    return heatmap, top_pred_index
+    return heatmap, preds
 
-def create_superimposed_visualization(img, heatmap, colormap):
+def create_superimposed_visualization(img, heatmap, colormap, label,prediction ,alpha=0.4):
     heatmap = cv2.resize(heatmap, (img.shape[1], img.shape[0]))
     
-    heatmap = np.uint8(255*heatmap)
+    heatmap *=(255.0/heatmap.max())
+    heatmap = np.uint8(heatmap)
     heatmap = cv2.applyColorMap(heatmap,colormap )
-    #superimposed_img = heatmap * 0.4 + img
+
+    image =img *(255.0/img.max())
+    superimposed_img = np.uint8( heatmap *alpha + (1-alpha)*image)
     
-    #return superimposed_img
+    guid=str( uuid.uuid4())
+
+
+    cv2.imwrite("gradcam_images/"+guid+"_label_"+str( label)+".png",cv2.cvtColor( np.uint8(image), cv2.COLOR_RGB2BGR))
+    cv2.imwrite("gradcam_images/"+guid+"_pred_"+str(np.uint8(prediction))+".png", cv2.cvtColor(np.uint8(superimposed_img), cv2.COLOR_RGB2BGR))
+
+    return superimposed_img
     return heatmap
+def make_gradcam_heatmap_orig(img_array, model, last_conv_layer_name, pred_index=None):
+    grad_model = tf.keras.models.Model(
+        [model.inputs], [model.get_layer(last_conv_layer_name).output, model.output]
+    )
+
+    with tf.GradientTape() as tape:
+        last_conv_layer_output, preds = grad_model(img_array)
+        if pred_index is None:
+            pred_index = tf.argmax(preds[0])
+        class_channel = preds[:, pred_index]
+
+    grads = tape.gradient(class_channel, last_conv_layer_output)
+
+    pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
+
+    last_conv_layer_output = last_conv_layer_output[0]
+    heatmap = last_conv_layer_output @ pooled_grads[..., tf.newaxis]
+    heatmap = tf.squeeze(heatmap)
+
+    heatmap = tf.maximum(heatmap, 0) / tf.math.reduce_max(heatmap)
+    return heatmap.numpy(), pred_index
+
