@@ -6,7 +6,7 @@ import gradcam
 import cv2
 from tqdm.notebook import tqdm
 import albumentations
-
+import utils3
 
 class PANDAGenerator(Sequence):
     def __init__(self, df, config, mode='fit', apply_tfms=True, shuffle=True):
@@ -58,10 +58,13 @@ class PANDAGenerator(Sequence):
                 print(img_name)
         if self.mode == 'fit':
             y = np.zeros((self.config.batch_size, self.config.num_classes), dtype=np.float32)
+            # y = np.zeros((self.config.batch_size), dtype=np.float32)
             lbls_batch = self.labels[index * self.config.batch_size : (index + 1) * self.config.batch_size]
             
             for i in range(self.config.batch_size):
+                #y[i, :lbls_batch[i]] = 1
                 y[i, lbls_batch[i]] = 1
+                # y[i] = lbls_batch[i]
             return X, y
         
         elif self.mode == 'predict':

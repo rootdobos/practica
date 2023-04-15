@@ -55,12 +55,21 @@ def build_efficientNetB2(config):
     
     x = GlobalAveragePooling2D()(base_model.output)
     dropout= Dropout(0.20)(x)
+    #output = Dense(config.num_classes, activation='sigmoid')(dropout)
+    
     output = Dense(config.num_classes, activation='softmax')(dropout)
+    
+    # x= Dense(config.num_classes,activation='relu')(dropout)
+    # output= Dense(1)(x)
+    
     model = Model(inputs=[base_model.input], outputs=[output])
 
+    # model.compile(loss=tf.keras.losses.MeanSquaredError(), optimizer=Adam(lr=config.learning_rate), \
+    #           metrics=[tfa.metrics.CohenKappa(weightage='quadratic', num_classes=config.num_classes)])
     model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=config.learning_rate), \
-              metrics=[tfa.metrics.CohenKappa(weightage='quadratic', num_classes=6)])
-    
+              metrics=[tfa.metrics.CohenKappa(weightage='quadratic', num_classes=config.num_classes)])
+
+
     return model
 
 def build_vgg16(config):

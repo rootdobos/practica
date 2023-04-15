@@ -295,3 +295,13 @@ def resize(file):
         cv2.imwrite("E:/data/prostate_cancer/tiles/0_192_6_6_0/{}.png".format(file),img_resized)
     except:
         print(file)
+def one_hot_encoding(index, batch_size, num_classes,labels):
+    y = np.zeros((batch_size, num_classes), dtype=np.float32)
+    # y = np.zeros((self.config.batch_size), dtype=np.float32)
+    lbls_batch = labels[index * batch_size : (index + 1) * batch_size]
+    
+    for i in range(batch_size):
+        #y[i, :lbls_batch[i]] = 1
+        y[i, lbls_batch[i]] = 1
+        # y[i] = lbls_batch[i]
+    return y
