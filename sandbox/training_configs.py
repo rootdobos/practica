@@ -1,7 +1,7 @@
 IMG_SIZE=64
 BATCH_SIZE=2
 NUM_TILES=36
-EPOCHS=11
+EPOCHS=8
 NUM_CLASSES=6
 LEARNING_RATE=3e-4
 TRAIN_DATA_NAME="0_256_6_6_4"
@@ -41,7 +41,7 @@ class config:
         self.verbose = verbose
         self.full_dataset=full_dataset
         if full_dataset:
-            self.train_csv = "E:/data/prostate_cancer/tiles/{}.csv".format(train_data_name)
+            self.train_csv = "E:/data/prostate_cancer/tiles/{}_train.csv".format(train_data_name)
             self.backbone_train_path='E:/data/prostate_cancer/tiles/{}/'.format(train_data_name)
         else:
             self.train_csv = "tiles/{}.csv".format(train_data_name)

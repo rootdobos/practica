@@ -103,7 +103,7 @@ def load_and_resize_mask(img_id):
 
 def overlay_mask_on_slide(images,train, center='radboud', alpha=0.8, max_size=(800, 800)):
     """Show a mask overlayed on a slide."""
-    f, ax = plt.subplots(5,3, figsize=(18,22))
+    f, ax = plt.subplots(2,3, figsize=(18,22))
     
     
     for i, image_id in enumerate(images):

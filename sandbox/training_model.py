@@ -6,12 +6,12 @@ import pandaGenerator
 import models
 import numpy as np
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, CSVLogger
-def train_model(config,model):
+def train_model(config,model, folds=5):
     
 
     gradcam.seed_everything(config.seed)
 
-    skf= StratifiedKFold(5, shuffle=True,random_state=42)
+    skf= StratifiedKFold(folds, shuffle=True,random_state=42)
 
     df = pd.read_csv(config.train_csv)
     df = df.sample(frac=1, random_state=config.seed).reset_index(drop=True)
@@ -29,7 +29,10 @@ def train_model(config,model):
     train_df  = df.loc[train_idx]
     valid_df = df.loc[valid_idx]
     #train_df, valid_df = train_test_split(df, test_size=0.2, random_state=config.seed)
-
+    # temp = train_df.groupby('isup_grade').count()['image_id'].reset_index().sort_values(by='image_id',ascending=False)
+    # print(temp)
+    # temp = valid_df.groupby('isup_grade').count()['image_id'].reset_index().sort_values(by='image_id',ascending=False)
+    # print(temp)
     train_datagen = pandaGenerator.PANDAGenerator(
         df=train_df, 
         config=config,
